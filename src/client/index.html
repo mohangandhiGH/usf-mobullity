@@ -189,6 +189,7 @@
 <script type="text/javascript" defer>
 
 var webapp = null;
+var previousURL = null;
 
 $(window).load(function() {
     var templateUrls = [ //new Array(
@@ -211,14 +212,22 @@ $(window).load(function() {
             }
         });
     }
-    
-    window.addEventListener('popstate', function(event) {
-        if(!location.hash){
-            if(event.state) window.location = event.state.page;
-                else window.location = location.href;
-            }
-    }, false);
 });
+
+window.onpopstate = function() {
+    var onclick = document.activeElement.onclick;
+    if(!onclick) {
+        previousURL = sessionStorage.getItem("previousURL");
+        if(!previousURL) previousURL = otp.config.siteUrl;
+        if(previousURL != (otp.config.siteUrl + location.search))
+            location.reload();
+        sessionStorage.setItem("previousURL", otp.config.siteUrl + location.search);
+        if(webapp) {
+            if(location.hash == '#layers') webapp.modules[0].layerWidget.show();
+            else webapp.modules[0].optionsWidget.show();
+        }
+    }
+};
 
 </script>
 
